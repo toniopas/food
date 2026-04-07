@@ -2,13 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 
-# ── Variable globale : URL de base du site ──────────────────────────────────
 BASE_URL = "https://www.infocalories.fr/calories/calories-{}.php"
 FAT_THRESHOLD = 20  # seuil en % pour considérer un aliment comme gras
 
 
 class Food:
-    """ Classe représentant un aliment avec ses valeurs nutritionnelles """
 
     __name      = None
     __calories  = None
@@ -16,7 +14,6 @@ class Food:
     __carbs     = None   # glucides
     __proteins  = None   # protéines
 
-    # ── Getters ─────────────────────────────────────────────────────────────
 
     def get_name(self):
         """ Retourne le nom de l'aliment """
@@ -38,7 +35,6 @@ class Food:
         """ Retourne les protéines (g) """
         return self.__proteins
 
-    # ── Setters ─────────────────────────────────────────────────────────────
 
     def set_name(self, name):
         """ Définit le nom de l'aliment """
@@ -60,37 +56,24 @@ class Food:
         """ Définit les protéines """
         self.__proteins = proteins
 
-    # ── Méthodes principales ─────────────────────────────────────────────────
 
     def retrieve_food_infos(self, food_name):
-        """
-        Scrape les informations nutritionnelles depuis infocalories.fr
-        en fonction du nom de l'aliment donné.
 
-        - L'URL est construite depuis la variable globale BASE_URL
-        - Vérifie que la requête HTTP a réussi (code 200)
-        - Lève une exception si la requête échoue
-        """
         self.set_name(food_name)
 
-        # Construction de l'URL : "avocat" → calories-avocat.php
         slug = food_name.lower().replace(" ", "-")
         url  = BASE_URL.format(slug)
 
-        # Requête HTTP
         response = requests.get(url, timeout=10)
 
-        # Vérification du succès
         if response.status_code != 200:
             raise ConnectionError(
                 f"Échec de la requête pour '{food_name}' "
                 f"(HTTP {response.status_code}) — URL : {url}"
             )
 
-        # Parsing HTML
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Extraction via les patterns textuels de la page
         import re
 
         text = soup.get_text()
@@ -105,14 +88,7 @@ class Food:
         self.set_fat(extraire(r"(\d+[\.,]?\d*)\s*g\s+de\s+lipides"))
 
     def display_food_infos(self):
-        """
-        Affiche les informations nutritionnelles sous forme de tableau :
 
-        ------------------------------------------------
-        name       calories   fat      carbs    proteins
-        tomate     21.0       0.3      4.6      0.8
-        ------------------------------------------------
-        """
         separator = "-" * 56
         print(separator)
         print(f"{'name':<15}{'calories':<12}{'fat':<10}{'carbs':<10}{'proteins'}")
@@ -126,10 +102,7 @@ class Food:
         print(separator)
 
     def save_to_csv_file(self, file_name):
-        """
-        Sauvegarde les informations nutritionnelles dans un fichier CSV.
-        Utilise 'with' pour l'ouverture du fichier (bonne pratique).
-        """
+
         with open(file_name, mode="w", newline="", encoding="utf-8") as csvfile:
             writer = csv.writer(csvfile)
             # En-tête
@@ -145,11 +118,7 @@ class Food:
         print(f"✅  Données sauvegardées dans '{file_name}'")
 
     def is_fat(self):
-        """
-        Retourne True si les lipides représentent plus de FAT_THRESHOLD %
-        des calories totales (1g de lipides = 9 kcal).
-        Retourne False si les données ne sont pas disponibles.
-        """
+
         if self.__calories is None or self.__fat is None or self.__calories == 0:
             return False
 
@@ -159,20 +128,16 @@ class Food:
         return fat_percentage > FAT_THRESHOLD
 
 
-# ── Programme de test ────────────────────────────────────────────────────────
 if __name__ == "__main__":
 
-    aliments_a_tester = ["avocat", "tomate", "amande"]
+    nom = input("Entrez le nom d'un aliment : ")
+    food = Food()
 
-    for nom in aliments_a_tester:
-        print(f"\n🔍  Recherche : {nom}")
-        food = Food()
+    try:
+        food.retrieve_food_infos(nom)
+        food.display_food_infos()
+        food.save_to_csv_file(f"{nom}.csv")
+        print(f"   Aliment gras (> {FAT_THRESHOLD}% lipides) : {food.is_fat()}")
 
-        try:
-            food.retrieve_food_infos(nom)
-            food.display_food_infos()
-            food.save_to_csv_file(f"{nom}.csv")
-            print(f"   Aliment gras (> {FAT_THRESHOLD}% lipides) : {food.is_fat()}")
-
-        except ConnectionError as e:
-            print(f"❌  Erreur : {e}")
+    except ConnectionError as e:
+        print(f"❌  Erreur : {e}")
