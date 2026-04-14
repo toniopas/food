@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 60px auto;
+            background: #f5f5f5;
+            color: #333;
+        }
+        h1 { text-align: center; }
+        form {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #45a049; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        th {
+            background: #4CAF50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .fat-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .fat-yes { background: #ffcccc; color: #c00; }
+        .fat-no  { background: #ccffcc; color: #080; }
+        .error {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px;
+            border-radius: 4px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>🥗 Food Info</h1>
+
+    <form method="POST">
+        <input type="text" name="food_name" placeholder="Ex: tomate, avocat, amande..."
+               value="{{ food_name }}" autofocus>
+        <button type="submit">Rechercher</button>
+    </form>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if food %}
+        <table>
+            <tr><th>Aliment</th><td>{{ food.name }}</td></tr>
+            <tr><th>Calories</th><td>{{ food.calories }} kcal</td></tr>
+            <tr><th>Lipides</th><td>{{ food.fat }} g</td></tr>
+            <tr><th>Glucides</th><td>{{ food.carbs }} g</td></tr>
+            <tr><th>Protéines</th><td>{{ food.proteins }} g</td></tr>
+            <tr>
+                <th>Gras ?</th>
+                <td>
+                    {% if food.is_fat %}
+                        <span class="fat-badge fat-yes">Oui (&gt;20%)</span>
+                    {% else %}
+                        <span class="fat-badge fat-no">Non</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    {% endif %}
+</body>
+</html>

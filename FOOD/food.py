@@ -76,11 +76,17 @@ class Food:
         # HTTP request
         response = requests.get(url, timeout=10)
 
+        # Fallback: try singular form if plural returns 404
+        if response.status_code == 404 and slug.endswith("s"):
+            slug = slug[:-1]
+            url = BASE_URL.format(slug)
+            response = requests.get(url, timeout=10)
+
         # Check request success
         if response.status_code != 200:
             raise ConnectionError(
-                f"Request failed for '{food_name}' "
-                f"(HTTP {response.status_code}) — URL: {url}"
+                f"Aliment '{food_name}' introuvable sur le site. "
+                f"Essayez avec un autre nom (ex: singulier, sans accent)."
             )
 
         # Parse HTML
