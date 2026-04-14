@@ -1,7 +1,10 @@
-import requests
-from bs4 import BeautifulSoup
+"""Module for scraping and managing food nutritional information."""
+
 import csv
 import re
+
+import requests
+from bs4 import BeautifulSoup
 
 # Global variable : base URL of the website
 BASE_URL = "https://www.infocalories.fr/calories/calories-{}.php"

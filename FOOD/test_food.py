@@ -1,4 +1,7 @@
+"""Unit tests for the Food class."""
+
 import unittest
+
 from food import Food
 
 

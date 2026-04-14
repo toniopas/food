@@ -1,0 +1,3 @@
+[MESSAGES CONTROL]
+# Ignore import-error for third-party packages not installed in pylint's env
+disable=import-error

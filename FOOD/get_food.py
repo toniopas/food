@@ -1,7 +1,9 @@
-from food import Food
+"""Script to retrieve and display food nutritional information."""
+
 import argparse
 
-import sys
+from food import Food
+
 print("Running script...")
 
 parser = argparse.ArgumentParser("Food Informations")
