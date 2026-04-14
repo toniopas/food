@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Food Info</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f4f0; color: #333; }
+
+        /* Navbar */
+        nav {
+            background: #4CAF50;
+            color: white;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav h1 { font-size: 1.3rem; }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+        nav a:hover { background: rgba(0,0,0,0.25); }
+
+        /* Layout */
+        .container {
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Left panel: food list */
+        .panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 20px;
+            width: 300px;
+            flex-shrink: 0;
+        }
+        .panel h2 { font-size: 1rem; margin-bottom: 14px; color: #555; }
+
+        #search {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+        }
+        #search:focus { outline: none; border-color: #4CAF50; }
+
+        #food-list {
+            list-style: none;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        #food-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 4px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        #food-list li:last-child { border-bottom: none; }
+        #food-list li span { text-transform: capitalize; font-size: 0.95rem; }
+        #food-list li button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-size: 0.82rem;
+        }
+        #food-list li button:hover { background: #45a049; }
+        .hidden { display: none; }
+
+        /* Right panel: food info */
+        .info-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 28px;
+            flex: 1;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .placeholder { color: #bbb; font-size: 1rem; text-align: center; }
+        .food-card h2 { font-size: 1.5rem; text-transform: capitalize; margin-bottom: 20px; }
+        .food-card table { width: 100%; border-collapse: collapse; }
+        .food-card th {
+            background: #f9f9f9;
+            text-align: left;
+            padding: 12px;
+            font-size: 0.9rem;
+            color: #777;
+            width: 40%;
+        }
+        .food-card td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 1rem; }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .fat-yes { background: #ffcccc; color: #c00; }
+        .fat-no  { background: #ccffcc; color: #080; }
+        .error-msg { color: #c00; text-align: center; }
+
+        #spinner {
+            display: none;
+            text-align: center;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h1>🥗 Food Info</h1>
+    <a href="/logout">Déconnexion</a>
+</nav>
+
+<div class="container">
+
+    <!-- Liste des aliments -->
+    <div class="panel">
+        <h2>Aliments disponibles</h2>
+        <input type="text" id="search" placeholder="Rechercher...">
+        <ul id="food-list">
+            {% for food in foods %}
+            <li data-name="{{ food }}">
+                <span>{{ food.replace('-', ' ') }}</span>
+                <button onclick="loadFood('{{ food }}')">Voir</button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Infos de l'aliment sélectionné -->
+    <div class="info-panel" id="info-panel">
+        <p class="placeholder">Sélectionnez un aliment pour voir ses informations nutritionnelles.</p>
+    </div>
+
+</div>
+
+<script>
+    // Barre de recherche — filtre la liste
+    document.getElementById("search").addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+        document.querySelectorAll("#food-list li").forEach(li => {
+            const name = li.dataset.name.toLowerCase();
+            li.classList.toggle("hidden", !name.includes(query));
+        });
+    });
+
+    // Chargement des infos via l'API
+    function loadFood(name) {
+        const panel = document.getElementById("info-panel");
+        panel.innerHTML = '<p style="color:#888;text-align:center">Chargement...</p>';
+
+        fetch(`/api/food/${name}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    panel.innerHTML = `<p class="error-msg">${data.error}</p>`;
+                    return;
+                }
+                panel.innerHTML = `
+                    <div class="food-card">
+                        <h2>${data.name.replace('-', ' ')}</h2>
+                        <table>
+                            <tr><th>Calories</th><td>${data.calories ?? "—"} kcal</td></tr>
+                            <tr><th>Lipides</th><td>${data.fat ?? "—"} g</td></tr>
+                            <tr><th>Glucides</th><td>${data.carbs ?? "—"} g</td></tr>
+                            <tr><th>Protéines</th><td>${data.proteins ?? "—"} g</td></tr>
+                            <tr><th>Aliment gras ?</th><td>
+                                ${data.is_fat
+                                    ? '<span class="badge fat-yes">Oui (&gt;20%)</span>'
+                                    : '<span class="badge fat-no">Non</span>'}
+                            </td></tr>
+                        </table>
+                    </div>`;
+            })
+            .catch(() => {
+                panel.innerHTML = '<p class="error-msg">Erreur de connexion.</p>';
+            });
+    }
+</script>
+
+</body>
+</html>

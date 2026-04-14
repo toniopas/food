@@ -1,2 +1,4 @@
 .DS_Store
-*.csv*.csv
+*.csv
+FOOD/users.json
+__pycache__/
