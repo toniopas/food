@@ -6,101 +6,156 @@
     <title>Inscription — Food Info</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
         }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+        .logo span { color: #aaa; font-weight: 400; }
+
         .card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-            width: 360px;
+            background: #242424;
+            border: 1px solid #333;
+            padding: 36px 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 380px;
         }
-        h1 { text-align: center; margin-bottom: 8px; font-size: 1.6rem; }
-        .subtitle { text-align: center; color: #888; margin-bottom: 28px; font-size: 0.9rem; }
-        label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; color: #555; }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            color: #777;
+            font-size: 0.88rem;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #aaa;
+            margin-bottom: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         input[type="text"], input[type="password"] {
             width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
+            padding: 11px 14px;
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #fff;
             margin-bottom: 18px;
-            transition: border 0.2s;
+            transition: border-color 0.2s;
         }
-        input:focus { outline: none; border-color: #3a3a3a; }
+        input::placeholder { color: #555; }
+        input:focus { outline: none; border-color: #666; }
+
         button {
             width: 100%;
             padding: 12px;
-            background: #3a3a3a;
-            color: white;
+            background: #fff;
+            color: #111;
             border: none;
-            border-radius: 6px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 4px;
         }
-        button:hover { background: #222222; }
+        button:hover { background: #e8e8e8; }
+        button:active { transform: scale(0.99); }
+
         .error {
-            background: #ffebee;
-            border: 1px solid #f44336;
-            color: #c62828;
+            background: #2a1a1a;
+            border: 1px solid #5a2a2a;
+            color: #ff7070;
             padding: 10px 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 18px;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
         .success {
-            background: #e8f5e9;
-            border: 1px solid #aaa;
-            color: #2e7d32;
+            background: #1a2a1a;
+            border: 1px solid #2a5a2a;
+            color: #70d070;
             padding: 10px 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 18px;
-            font-size: 0.9rem;
-        }
-        .login-link {
-            text-align: center;
-            margin-top: 18px;
             font-size: 0.88rem;
-            color: #888;
         }
-        .login-link a { color: #3a3a3a; text-decoration: none; font-weight: bold; }
-        .login-link a:hover { text-decoration: underline; }
+
+        .footer-link {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .footer-link a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .footer-link a:hover { color: #fff; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>🥗 Food Info</h1>
-        <p class="subtitle">Créer un compte</p>
+    <div class="wrapper">
+        <div class="logo">Food<span>Info</span></div>
 
-        {% if error %}
-            <div class="error">{{ error }}</div>
-        {% endif %}
-        {% if success %}
-            <div class="success">{{ success }}</div>
-        {% endif %}
+        <div class="card">
+            <h2>Créer un compte</h2>
+            <p class="subtitle">Rejoignez FoodInfo en quelques secondes</p>
 
-        <form method="POST">
-            <label for="username">Identifiant</label>
-            <input type="text" id="username" name="username" placeholder="Choisissez un identifiant" autofocus>
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
+            {% if success %}
+                <div class="success">{{ success }}</div>
+            {% endif %}
 
-            <label for="password">Mot de passe</label>
-            <input type="password" id="password" name="password" placeholder="Minimum 4 caractères">
+            <form method="POST">
+                <label for="username">Identifiant</label>
+                <input type="text" id="username" name="username" placeholder="Choisissez un identifiant" autofocus>
 
-            <label for="confirm">Confirmer le mot de passe</label>
-            <input type="password" id="confirm" name="confirm" placeholder="Répétez le mot de passe">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" placeholder="Minimum 4 caractères">
 
-            <button type="submit">Créer le compte</button>
-        </form>
+                <label for="confirm">Confirmer le mot de passe</label>
+                <input type="password" id="confirm" name="confirm" placeholder="Répétez le mot de passe">
 
-        <div class="login-link">
+                <button type="submit">Créer le compte</button>
+            </form>
+        </div>
+
+        <div class="footer-link">
             Déjà un compte ? <a href="/login">Se connecter</a>
         </div>
     </div>

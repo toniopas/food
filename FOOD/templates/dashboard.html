@@ -6,196 +6,364 @@
     <title>Dashboard — Food Info</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; background: #f2f2f2; color: #333; }
 
-        /* Navbar */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #ddd;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Navbar ── */
         nav {
-            background: #3a3a3a;
-            color: white;
-            padding: 14px 24px;
+            background: #242424;
+            border-bottom: 1px solid #333;
+            padding: 0 28px;
+            height: 56px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-        }
-        nav h1 { font-size: 1.3rem; }
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-size: 0.9rem;
-            background: rgba(0,0,0,0.15);
-            padding: 6px 14px;
-            border-radius: 20px;
-        }
-        nav a:hover { background: rgba(0,0,0,0.25); }
-
-        /* Layout */
-        .container {
-            display: flex;
-            gap: 24px;
-            padding: 24px;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        /* Left panel: food list */
-        .panel {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 20px;
-            width: 300px;
+            justify-content: space-between;
             flex-shrink: 0;
         }
-        .panel h2 { font-size: 1rem; margin-bottom: 14px; color: #555; }
+        .nav-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+        .nav-logo span { color: #777; font-weight: 400; }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .nav-user {
+            font-size: 0.85rem;
+            color: #777;
+        }
+        .nav-logout {
+            font-size: 0.82rem;
+            color: #aaa;
+            text-decoration: none;
+            background: #333;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav-logout:hover { background: #444; color: #fff; }
+
+        /* ── Layout ── */
+        .container {
+            display: flex;
+            gap: 0;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: #202020;
+            border-right: 1px solid #2e2e2e;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 18px 20px 12px;
+            border-bottom: 1px solid #2e2e2e;
+        }
+        .sidebar-header h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
 
         #search {
             width: 100%;
             padding: 9px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            margin-bottom: 14px;
+            background: #2a2a2a;
+            border: 1px solid #363636;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            color: #ddd;
+            transition: border-color 0.2s;
         }
-        #search:focus { outline: none; border-color: #3a3a3a; }
+        #search::placeholder { color: #555; }
+        #search:focus { outline: none; border-color: #555; }
+
+        .food-count {
+            font-size: 0.75rem;
+            color: #555;
+            padding: 8px 20px;
+            border-bottom: 1px solid #2e2e2e;
+        }
+        #count-visible { color: #888; font-weight: 600; }
 
         #food-list {
             list-style: none;
-            max-height: 500px;
             overflow-y: auto;
+            flex: 1;
         }
+        #food-list::-webkit-scrollbar { width: 4px; }
+        #food-list::-webkit-scrollbar-track { background: transparent; }
+        #food-list::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 2px; }
+
         #food-list li {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 9px 4px;
-            border-bottom: 1px solid #f0f0f0;
+            justify-content: space-between;
+            padding: 9px 20px;
+            border-bottom: 1px solid #262626;
+            cursor: pointer;
+            transition: background 0.15s;
         }
-        #food-list li:last-child { border-bottom: none; }
-        #food-list li span { text-transform: capitalize; font-size: 0.95rem; }
+        #food-list li:hover { background: #2a2a2a; }
+        #food-list li.active { background: #2e2e2e; border-left: 2px solid #888; }
+        #food-list li.hidden { display: none; }
+
+        #food-list li span {
+            text-transform: capitalize;
+            font-size: 0.88rem;
+            color: #ccc;
+        }
         #food-list li button {
-            background: #3a3a3a;
-            color: white;
+            background: #333;
+            color: #ccc;
             border: none;
             border-radius: 5px;
-            padding: 5px 12px;
+            padding: 4px 10px;
             cursor: pointer;
-            font-size: 0.82rem;
+            font-size: 0.75rem;
+            transition: background 0.15s, color 0.15s;
         }
-        #food-list li button:hover { background: #222222; }
-        .hidden { display: none; }
+        #food-list li button:hover { background: #444; color: #fff; }
 
-        /* Right panel: food info */
-        .info-panel {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 28px;
+        /* ── Main panel ── */
+        .main {
             flex: 1;
-            min-height: 300px;
+            overflow-y: auto;
+            padding: 40px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
         }
-        .placeholder { color: #bbb; font-size: 1rem; text-align: center; }
-        .food-card h2 { font-size: 1.5rem; text-transform: capitalize; margin-bottom: 20px; }
-        .food-card table { width: 100%; border-collapse: collapse; }
-        .food-card th {
-            background: #f9f9f9;
-            text-align: left;
-            padding: 12px;
-            font-size: 0.9rem;
-            color: #777;
-            width: 40%;
+
+        .placeholder {
+            text-align: center;
+            color: #444;
+            margin-top: 80px;
         }
-        .food-card td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 1rem; }
+        .placeholder-icon { font-size: 3rem; margin-bottom: 16px; }
+        .placeholder p { font-size: 0.95rem; }
+
+        /* Food card */
+        .food-card {
+            background: #242424;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 36px;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .food-card-header {
+            margin-bottom: 28px;
+        }
+        .food-card-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: capitalize;
+            margin-bottom: 4px;
+        }
+        .food-card-header p {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: #1e1e1e;
+            border: 1px solid #2e2e2e;
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-unit {
+            font-size: 0.8rem;
+            color: #555;
+            font-weight: 400;
+            margin-left: 3px;
+        }
+
+        .fat-row {
+            background: #1e1e1e;
+            border: 1px solid #2e2e2e;
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .fat-row-label {
+            font-size: 0.85rem;
+            color: #999;
+        }
         .badge {
             display: inline-block;
             padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: bold;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
-        .fat-yes { background: #e8e8e8; color: #222; }
-        .fat-no  { background: #e0e0e0; color: #444; }
-        .error-msg { color: #c00; text-align: center; }
+        .fat-yes { background: #3a1a1a; color: #ff7070; border: 1px solid #5a2a2a; }
+        .fat-no  { background: #1a2a1a; color: #70c070; border: 1px solid #2a4a2a; }
 
-        #spinner {
-            display: none;
+        .loading {
             text-align: center;
-            color: #888;
+            color: #555;
+            margin-top: 80px;
+            font-size: 0.95rem;
+        }
+        .error-msg {
+            text-align: center;
+            color: #ff7070;
+            margin-top: 80px;
         }
     </style>
 </head>
 <body>
 
 <nav>
-    <h1>🥗 Food Info</h1>
-    <a href="/logout">Déconnexion</a>
+    <div class="nav-logo">Food<span>Info</span></div>
+    <div class="nav-right">
+        <span class="nav-user">922 aliments disponibles</span>
+        <a href="/logout" class="nav-logout">Déconnexion</a>
+    </div>
 </nav>
 
 <div class="container">
 
-    <!-- Liste des aliments -->
-    <div class="panel">
-        <h2>Aliments disponibles</h2>
-        <input type="text" id="search" placeholder="Rechercher...">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Aliments</h2>
+            <input type="text" id="search" placeholder="Rechercher un aliment...">
+        </div>
+        <div class="food-count"><span id="count-visible">922</span> résultats</div>
         <ul id="food-list">
             {% for food in foods %}
-            <li data-name="{{ food }}">
+            <li data-name="{{ food }}" onclick="loadFood('{{ food }}', this)">
                 <span>{{ food.replace('-', ' ') }}</span>
-                <button onclick="loadFood('{{ food }}')">Voir</button>
+                <button>Voir</button>
             </li>
             {% endfor %}
         </ul>
     </div>
 
-    <!-- Infos de l'aliment sélectionné -->
-    <div class="info-panel" id="info-panel">
-        <p class="placeholder">Sélectionnez un aliment pour voir ses informations nutritionnelles.</p>
+    <!-- Main -->
+    <div class="main" id="main-panel">
+        <div class="placeholder">
+            <div class="placeholder-icon">🥗</div>
+            <p>Sélectionnez un aliment pour voir ses informations nutritionnelles.</p>
+        </div>
     </div>
 
 </div>
 
 <script>
-    // Barre de recherche — filtre la liste
-    document.getElementById("search").addEventListener("input", function () {
+    // Recherche avec compteur
+    const searchInput = document.getElementById("search");
+    const countEl = document.getElementById("count-visible");
+    const items = document.querySelectorAll("#food-list li");
+
+    searchInput.addEventListener("input", function () {
         const query = this.value.toLowerCase();
-        document.querySelectorAll("#food-list li").forEach(li => {
-            const name = li.dataset.name.toLowerCase();
-            li.classList.toggle("hidden", !name.includes(query));
+        let visible = 0;
+        items.forEach(li => {
+            const match = li.dataset.name.toLowerCase().includes(query);
+            li.classList.toggle("hidden", !match);
+            if (match) visible++;
         });
+        countEl.textContent = visible;
     });
 
-    // Chargement des infos via l'API
-    function loadFood(name) {
-        const panel = document.getElementById("info-panel");
-        panel.innerHTML = '<p style="color:#888;text-align:center">Chargement...</p>';
+    // Chargement
+    function loadFood(name, el) {
+        // Active state
+        document.querySelectorAll("#food-list li").forEach(li => li.classList.remove("active"));
+        if (el) el.classList.add("active");
+
+        const panel = document.getElementById("main-panel");
+        panel.innerHTML = '<div class="loading">Chargement...</div>';
 
         fetch(`/api/food/${name}`)
             .then(res => res.json())
             .then(data => {
                 if (data.error) {
-                    panel.innerHTML = `<p class="error-msg">${data.error}</p>`;
+                    panel.innerHTML = `<div class="error-msg">${data.error}</div>`;
                     return;
                 }
+                const fatBadge = data.is_fat
+                    ? '<span class="badge fat-yes">Gras (&gt;20%)</span>'
+                    : '<span class="badge fat-no">Non gras</span>';
+
                 panel.innerHTML = `
                     <div class="food-card">
-                        <h2>${data.name.replace('-', ' ')}</h2>
-                        <table>
-                            <tr><th>Calories</th><td>${data.calories ?? "—"} kcal</td></tr>
-                            <tr><th>Lipides</th><td>${data.fat ?? "—"} g</td></tr>
-                            <tr><th>Glucides</th><td>${data.carbs ?? "—"} g</td></tr>
-                            <tr><th>Protéines</th><td>${data.proteins ?? "—"} g</td></tr>
-                            <tr><th>Aliment gras ?</th><td>
-                                ${data.is_fat
-                                    ? '<span class="badge fat-yes">Oui (&gt;20%)</span>'
-                                    : '<span class="badge fat-no">Non</span>'}
-                            </td></tr>
-                        </table>
+                        <div class="food-card-header">
+                            <h2>${data.name.replace(/-/g, ' ')}</h2>
+                            <p>Valeurs nutritionnelles pour 100g</p>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-label">Calories</div>
+                                <div class="stat-value">${data.calories ?? '—'}<span class="stat-unit">kcal</span></div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Lipides</div>
+                                <div class="stat-value">${data.fat ?? '—'}<span class="stat-unit">g</span></div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Glucides</div>
+                                <div class="stat-value">${data.carbs ?? '—'}<span class="stat-unit">g</span></div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Protéines</div>
+                                <div class="stat-value">${data.proteins ?? '—'}<span class="stat-unit">g</span></div>
+                            </div>
+                        </div>
+                        <div class="fat-row">
+                            <span class="fat-row-label">Teneur en graisses</span>
+                            ${fatBadge}
+                        </div>
                     </div>`;
             })
             .catch(() => {
-                panel.innerHTML = '<p class="error-msg">Erreur de connexion.</p>';
+                panel.innerHTML = '<div class="error-msg">Erreur de connexion.</div>';
             });
     }
 </script>
